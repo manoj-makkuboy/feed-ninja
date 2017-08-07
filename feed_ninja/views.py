@@ -21,7 +21,7 @@ def get_title(request):
     result = []
 
     for feed in aggregate_feed_objects:
-        for entry in feed['entries']:
+        for entry in feed['entries'][:recent]:
             result.append(entry['title'])
 
     result_json = json.dumps(result, ensure_ascii=False)
