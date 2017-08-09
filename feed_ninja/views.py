@@ -6,7 +6,9 @@ import logging
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 import asyncio
 import time
-
+import aiohttp
+import os
+import async_timeout
 
 feed_urls = {
     'FSFTN': 'https://fsftn.org/blog/rss/',
@@ -21,7 +23,6 @@ def get_title(request):
     json_input = json.loads(request.body)
     recent = json_input['recent']
     update_sources()
-#    time.sleep(2)
     result = []
 
     for feed in aggregate_feed_objects:
@@ -32,22 +33,35 @@ def get_title(request):
     return HttpResponse(result_json,
                         content_type='application/json; charset=utf-8')
 
-async def make_task(url):
-    logger.error("start",url)
-    aggregate_feed_objects.append(await my_coroutine(url))
-    logger.error("stop",url)
 
-async def my_coroutine(url):
-#    await asyncio.sleep(1) #asyncio.coroutine(feedparser.parse(url))
-    return  feedparser.parse(url)
+async def download_coroutine(session, url):
+    logging.warning("start", url)
+    with async_timeout.timeout(10):
+        async with session.get(url) as response:
+            save_path = '/home/manoj.mohan/Downloads/'
+            if url == feed_urls['FSFTN']:
+                file_name = 'file1'
+            else:
+                file_name = 'file2'
+            file_full_name = os.path.join(save_path, file_name)
+            with open(file_full_name, 'wb') as f_handle:
+                while True:
+                    chunk = await response.content.read(1024)
+                    if not chunk:
+                        break
+                    f_handle.write(chunk)
+            logging.warning("stop", url)
+            return await response.release()
+
+
+async def main(loop):
+    async with aiohttp.ClientSession(loop=loop) as session:
+        tasks = [download_coroutine(session, url) for url in feed_urls.values()]
+        await asyncio.gather(*tasks)
+
 def update_sources():
-
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     global aggregate_feed_objects
     aggregate_feed_objects = []
-    tasks = [asyncio.ensure_future(make_task('https://fsftn.org/blog/rss/')),
-             asyncio.ensure_future(make_task('http://norvig.com/rss-feed.xml'))]
-    wait_tasks = asyncio.wait(tasks)
-    loop.run_until_complete(wait_tasks)
-#    loop.close()
+    loop.run_until_complete(main(loop))
