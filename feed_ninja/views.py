@@ -18,6 +18,8 @@ aggregate_feed_objects = []
 logger = logging.getLogger(__name__)
 
 
+
+
 @csrf_exempt
 def get_title(request):
     json_input = json.loads(request.body)
@@ -34,23 +36,26 @@ def get_title(request):
                         content_type='application/json; charset=utf-8')
 
 
+def file_name_generator_function(url):
+    for key, value in feed_urls.items():
+        if value == url:
+            return key
+
+
 async def download_coroutine(session, url):
-    logging.warning("start", url)
     with async_timeout.timeout(10):
         async with session.get(url) as response:
             save_path = '/home/manoj.mohan/Downloads/'
-            if url == feed_urls['FSFTN']:
-                file_name = 'file1'
-            else:
-                file_name = 'file2'
+
+            file_name = file_name_generator_function(url)
+
             file_full_name = os.path.join(save_path, file_name)
-            with open(file_full_name, 'wb') as f_handle:
+            with open(file_full_name, 'wb+') as f_handle:
                 while True:
                     chunk = await response.content.read(1024)
                     if not chunk:
                         break
                     f_handle.write(chunk)
-            logging.warning("stop", url)
             return await response.release()
 
 
@@ -62,6 +67,7 @@ async def main(loop):
 def update_sources():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+    # Making the global aggaggregate_feed_objects empty.
     global aggregate_feed_objects
     aggregate_feed_objects = []
     loop.run_until_complete(main(loop))
