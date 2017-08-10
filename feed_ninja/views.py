@@ -104,7 +104,7 @@ class Articles(View):
         return HttpResponse(result_json,
                             content_type='application/json; charset=utf-8')
 
-@csrf_protect
+@csrf_exempt
 def update_load_feeds(request):
     update_sources()
     return HttpResponse('Done')
