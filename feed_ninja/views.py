@@ -28,7 +28,6 @@ file_save_path = '/home/manoj.mohan/Downloads/feeds/'
 def get_title(request):
     json_input = json.loads(request.body)
     recent = json_input['recent']
-    update_sources()
     result = []
 
     for feed in aggregate_feed_objects:
@@ -81,7 +80,6 @@ def update_sources():
     global aggregate_feed_objects
     aggregate_feed_objects = []
     loop.run_until_complete(main(loop))
-    load_feed_from_files()
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Articles(View):
@@ -92,8 +90,9 @@ class Articles(View):
         except ValueError:
             recent = None
 
-        update_sources()
         result = []
+
+        load_feed_from_files()
 
         for feed in aggregate_feed_objects:
             for entry in feed['entries'][:recent]:
@@ -104,3 +103,8 @@ class Articles(View):
         result_json = json.dumps(result, ensure_ascii=False)
         return HttpResponse(result_json,
                             content_type='application/json; charset=utf-8')
+
+@csrf_protect
+def update_load_feeds(request):
+    update_sources()
+    return HttpResponse('Done')
