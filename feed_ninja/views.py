@@ -11,7 +11,7 @@ import aiohttp
 import os
 import async_timeout
 from django.utils.decorators import method_decorator
-
+from django.core.paginator import Paginator
 
 feed_urls = {
     'FSFTN': 'https://fsftn.org/blog/rss/',
@@ -85,6 +85,7 @@ def update_sources():
 class Articles(View):
     def get(self, request):
         json_input = request.GET.get('recent', '')
+        input_page_number = request.GET.get('page', '')
         try:
             recent = int(json_input)
         except ValueError:
@@ -99,9 +100,11 @@ class Articles(View):
                 result.append({'title': entry['title'],
                                'description': entry['description'],
                                'link': entry['link']})
-
-        result_json = json.dumps(result, ensure_ascii=False)
-        return HttpResponse(result_json,
+        result = Paginator(result, 2)
+        page = result.page(input_page_number)
+        page = page.object_list
+        result_json = json.dumps(page, ensure_ascii=False)
+        return HttpResponse(page,
                             content_type='application/json; charset=utf-8')
 
 @csrf_exempt
