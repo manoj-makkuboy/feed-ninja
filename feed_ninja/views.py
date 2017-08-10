@@ -17,14 +17,19 @@ feed_urls = {
 aggregate_feed_objects = []
 logger = logging.getLogger(__name__)
 
+file_save_path = '/home/manoj.mohan/Downloads/feeds/'
 
 
 
 @csrf_exempt
 def get_title(request):
+
+
     json_input = json.loads(request.body)
     recent = json_input['recent']
+
     update_sources()
+
     result = []
 
     for feed in aggregate_feed_objects:
@@ -45,11 +50,9 @@ def file_name_generator_function(url):
 async def download_coroutine(session, url):
     with async_timeout.timeout(10):
         async with session.get(url) as response:
-            save_path = '/home/manoj.mohan/Downloads/'
 
             file_name = file_name_generator_function(url)
-
-            file_full_name = os.path.join(save_path, file_name)
+            file_full_name = os.path.join(file_save_path, file_name)
             with open(file_full_name, 'wb+') as f_handle:
                 while True:
                     chunk = await response.content.read(1024)
@@ -64,6 +67,14 @@ async def main(loop):
         tasks = [download_coroutine(session, url) for url in feed_urls.values()]
         await asyncio.gather(*tasks)
 
+
+def load_feed_from_files():
+    for url_name in feed_urls.keys():
+        full_file_path = file_save_path + url_name
+        logging.warning(full_file_path)
+        aggregate_feed_objects.append(feedparser.parse(full_file_path))
+
+
 def update_sources():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -71,3 +82,4 @@ def update_sources():
     global aggregate_feed_objects
     aggregate_feed_objects = []
     loop.run_until_complete(main(loop))
+    load_feed_from_files()
