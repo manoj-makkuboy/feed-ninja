@@ -4,11 +4,14 @@ import feedparser
 import json
 import logging
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views import View
 import asyncio
 import time
 import aiohttp
 import os
 import async_timeout
+from django.utils.decorators import method_decorator
+
 
 feed_urls = {
     'FSFTN': 'https://fsftn.org/blog/rss/',
@@ -23,13 +26,9 @@ file_save_path = '/home/manoj.mohan/Downloads/feeds/'
 
 @csrf_exempt
 def get_title(request):
-
-
     json_input = json.loads(request.body)
     recent = json_input['recent']
-
     update_sources()
-
     result = []
 
     for feed in aggregate_feed_objects:
@@ -83,3 +82,25 @@ def update_sources():
     aggregate_feed_objects = []
     loop.run_until_complete(main(loop))
     load_feed_from_files()
+
+@method_decorator(csrf_exempt, name='dispatch')
+class Articles(View):
+    def get(self, request):
+        json_input = request.GET.get('recent', '')
+        try:
+            recent = int(json_input)
+        except ValueError:
+            recent = None
+
+        update_sources()
+        result = []
+
+        for feed in aggregate_feed_objects:
+            for entry in feed['entries'][:recent]:
+                result.append({'title': entry['title'],
+                               'description': entry['description'],
+                               'link': entry['link']})
+
+        result_json = json.dumps(result, ensure_ascii=False)
+        return HttpResponse(result_json,
+                            content_type='application/json; charset=utf-8')
