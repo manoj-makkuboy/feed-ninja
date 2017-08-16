@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'users',
+    'rest_framework',
     'feed_ninja',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -121,3 +123,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CSRF_COOKIE_SECURE = False
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
