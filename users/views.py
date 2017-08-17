@@ -10,8 +10,8 @@ class UserList(APIView):
     Lists all the users or create new users.
     '''
     def get(self, request):
-        users = User.objects.all()
-        serializer_class = UserSerializer(users, many=True)
+        query_set = User.objects.all()
+        serializer_class = UserSerializer(query_set, many=True)
         return Response(serializer_class.data)
 
     def post(self, request):
