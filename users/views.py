@@ -1,4 +1,4 @@
-from .serializer import UserSerializer
+from .serializers import UserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -11,8 +11,8 @@ class UserList(APIView):
     '''
     def get(self, request):
         users = User.objects.all()
-        serializer_class = UserSerializer(users)
-        return Response(serializer_class)
+        serializer_class = UserSerializer(users, many=True)
+        return Response(serializer_class.data)
 
     def post(self, request):
         pass
