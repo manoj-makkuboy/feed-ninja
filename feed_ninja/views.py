@@ -10,6 +10,7 @@ import async_timeout
 from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
+import aiofiles
 
 
 feed_urls = {
@@ -32,12 +33,12 @@ async def download_feeds(session, url):
         async with session.get(url) as response:
             file_name = file_name_generator(url)
             file_full_name = os.path.join(file_save_path, file_name)
-            with open(file_full_name, 'wb+') as f_handle:
+            async with aiofiles.open(file_full_name, 'wb+') as f_handle:
                 while True:
                     chunk = await response.content.read(1024)
                     if not chunk:
                         break
-                    f_handle.write(chunk)
+                    await f_handle.write(chunk)
             return await response.release()
 
 
