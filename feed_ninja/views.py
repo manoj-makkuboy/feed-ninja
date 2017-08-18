@@ -38,7 +38,7 @@ def get_title(request):
                         content_type='application/json; charset=utf-8')
 
 
-def file_name_generator_function(url):
+def file_name_generator(url):
     for key, value in feed_urls.items():
         if value == url:
             return key
@@ -48,7 +48,7 @@ async def download_feeds(session, url):
     with async_timeout.timeout(10):
         async with session.get(url) as response:
 
-            file_name = file_name_generator_function(url)
+            file_name = file_name_generator(url)
             file_full_name = os.path.join(file_save_path, file_name)
             with open(file_full_name, 'wb+') as f_handle:
                 while True:
