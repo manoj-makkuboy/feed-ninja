@@ -33,7 +33,13 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'users',
     'rest_framework',
+    'rest_framework.authtoken',
     'feed_ninja',
+    'rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'rest_auth.registration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,7 +128,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CSRF_COOKIE_SECURE = False
+# CSRF_COOKIE_SECURE = False
 
 #REST_FRAMEWORK = {
 #    # Use Django's standard `django.contrib.auth` permissions,
@@ -131,3 +137,5 @@ CSRF_COOKIE_SECURE = False
 #        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
 #    ]
 #}
+SITE_ID = 1
+REST_USE_JWT = True
