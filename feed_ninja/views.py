@@ -12,6 +12,8 @@ import os
 import async_timeout
 from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
+
 
 feed_urls = {
     'FSFTN': 'https://fsftn.org/blog/rss/',
@@ -92,7 +94,6 @@ class Articles(View):
             recent = None
 
         result = []
-
         load_feed_from_files()
 
         for feed in aggregate_feed_objects:
@@ -101,7 +102,12 @@ class Articles(View):
                                'description': entry['description'],
                                'link': entry['link']})
         result = Paginator(result, 2)
-        page = result.page(input_page_number)
+
+        try:
+            page = result.page(input_page_number)
+        except PageNotAnInteger:
+            return HttpResponse('Please pass an int argument for page. eg. ../articles?page=1')
+
         page = page.object_list
         result_json = json.dumps(page, ensure_ascii=False)
         return HttpResponse(result_json,
