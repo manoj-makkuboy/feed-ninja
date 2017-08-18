@@ -1,12 +1,9 @@
-from django.http import HttpResponse, JsonResponse
-# Create your views here.
+from django.http import HttpResponse
 import feedparser
 import json
-import logging
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 import asyncio
-import time
 import aiohttp
 import os
 import async_timeout
@@ -20,7 +17,6 @@ feed_urls = {
     'norvig': 'http://norvig.com/rss-feed.xml'
 }
 aggregate_feed_objects = []
-logger = logging.getLogger(__name__)
 
 file_save_path = '/home/manoj.mohan/Downloads/feeds/'
 
@@ -34,7 +30,6 @@ def file_name_generator(url):
 async def download_feeds(session, url):
     with async_timeout.timeout(10):
         async with session.get(url) as response:
-
             file_name = file_name_generator(url)
             file_full_name = os.path.join(file_save_path, file_name)
             with open(file_full_name, 'wb+') as f_handle:
@@ -55,7 +50,6 @@ async def main_async_call_to_coroutines(loop):
 def load_feed_from_files():
     for url_name in feed_urls.keys():
         full_file_path = file_save_path + url_name
-        logging.warning(full_file_path)
         aggregate_feed_objects.append(feedparser.parse(full_file_path))
 
 
