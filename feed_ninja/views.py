@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 file_save_path = '/home/manoj.mohan/Downloads/feeds/'
 
 
-
 @csrf_exempt
 def get_title(request):
     json_input = json.loads(request.body)
@@ -45,7 +44,7 @@ def file_name_generator_function(url):
             return key
 
 
-async def download_coroutine(session, url):
+async def download_feeds(session, url):
     with async_timeout.timeout(10):
         async with session.get(url) as response:
 
@@ -60,9 +59,9 @@ async def download_coroutine(session, url):
             return await response.release()
 
 
-async def main(loop):
+async def main_async_call_to_coroutines(loop):
     async with aiohttp.ClientSession(loop=loop) as session:
-        tasks = [download_coroutine(session, url) for url in feed_urls.values()]
+        tasks = [download_feeds(session, url) for url in feed_urls.values()]
         await asyncio.gather(*tasks)
 
 
@@ -79,7 +78,8 @@ def update_sources():
     # Making the global aggaggregate_feed_objects empty.
     global aggregate_feed_objects
     aggregate_feed_objects = []
-    loop.run_until_complete(main(loop))
+    loop.run_until_complete(main_async_call_to_coroutines(loop))
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Articles(View):
@@ -104,8 +104,9 @@ class Articles(View):
         page = result.page(input_page_number)
         page = page.object_list
         result_json = json.dumps(page, ensure_ascii=False)
-        return HttpResponse(page,
+        return HttpResponse(result_json,
                             content_type='application/json; charset=utf-8')
+
 
 @csrf_exempt
 def update_load_feeds(request):
