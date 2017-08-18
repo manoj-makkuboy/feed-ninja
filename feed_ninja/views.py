@@ -25,21 +25,6 @@ logger = logging.getLogger(__name__)
 file_save_path = '/home/manoj.mohan/Downloads/feeds/'
 
 
-@csrf_exempt
-def get_title(request):
-    json_input = json.loads(request.body)
-    recent = json_input['recent']
-    result = []
-
-    for feed in aggregate_feed_objects:
-        for entry in feed['entries'][:recent]:
-            result.append(entry['title'])
-
-    result_json = json.dumps(result, ensure_ascii=False)
-    return HttpResponse(result_json,
-                        content_type='application/json; charset=utf-8')
-
-
 def file_name_generator(url):
     for key, value in feed_urls.items():
         if value == url:
