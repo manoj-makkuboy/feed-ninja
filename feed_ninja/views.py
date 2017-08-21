@@ -2,7 +2,7 @@ from django.http import HttpResponse
 import feedparser
 import json
 from django.views.decorators.csrf import csrf_exempt
-from django.views import View
+#from django.views import View
 import asyncio
 import aiohttp
 import os
@@ -12,6 +12,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 import aiofiles
 from rest_framework import permissions
+from rest_framework.views import APIView
 
 
 feed_urls = {
@@ -69,8 +70,8 @@ def update_sources():
     loop.run_until_complete(main_async_call_to_coroutines(loop))
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class Articles(View):
+#@method_decorator(csrf_exempt, name='dispatch')
+class Articles(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request):
         json_input = request.GET.get('recent', '')
@@ -99,6 +100,8 @@ class Articles(View):
         result_json = json.dumps(page, ensure_ascii=False)
         return HttpResponse(result_json,
                             content_type='application/json; charset=utf-8')
+
+
 
 
 @csrf_exempt
