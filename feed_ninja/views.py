@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 import aiofiles
+from rest_framework import permissions
 
 
 feed_urls = {
@@ -70,6 +71,7 @@ def update_sources():
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Articles(View):
+    permission_classes = (permissions.IsAuthenticated,)
     def get(self, request):
         json_input = request.GET.get('recent', '')
         input_page_number = request.GET.get('page', '')
