@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'users',
+    'custom_user',
     'rest_framework',
     'rest_framework.authtoken',
     'feed_ninja',

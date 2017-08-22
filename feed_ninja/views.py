@@ -94,13 +94,13 @@ class Articles(APIView):
         try:
             page = result.page(input_page_number)
         except PageNotAnInteger:
-            return HttpResponse('Please pass an int argument for page. eg. ../articles?page=1')
+            return HttpResponse(
+                'Please pass an int argument for page. eg. ../articles?page=1')
 
         page = page.object_list
         result_json = json.dumps(page, ensure_ascii=False)
         return HttpResponse(result_json,
                             content_type='application/json; charset=utf-8')
-
 
 
 
