@@ -13,8 +13,11 @@ class Category(models.Model):
 class CustomUser(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    location = models.CharField(max_length=40, blank=True)
-    interested_categories = models.ForeignKey(Category)
+    location = models.CharField(max_length=50, blank=True)
+    interested_categories = models.ForeignKey(Category,
+                                              on_delete=models.CASCADE,
+                                              null=False, default=1)
+
 
 
 @receiver(post_save, sender=User)
