@@ -1,4 +1,4 @@
-# feed-ninja
+# Feed Ninja
 A feed aggregator webservice with full unicode support, Build using Python + Django.
 
 Features:
