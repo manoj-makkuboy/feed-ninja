@@ -1,5 +1,5 @@
 # feed-ninja
-A feed aggregator django app built specifically for Indic languages
+A feed aggregator webservice with full unicode support, Build using Python + Django.
 
 Features:
 - Uses asyncio and aiohttp to download feeds asynchronously from a number of blogs.
