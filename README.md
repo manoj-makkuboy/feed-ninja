@@ -6,3 +6,6 @@ Features:
 - Uses feedparser to parse the downloaded feeds.
 - Uses Django Rest Framework to serialize the send the response.
 - User Authentication using JSON Web Tokens.
+
+Would you require a frontend for this?
+[Front Feed Ninja](https://github.com/manoj-makkuboy/front-feed-ninja)
